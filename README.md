@@ -1,5 +1,10 @@
-# meshtastic_frequency_slot_calculator
-Calculates the frequency slot for a given Meshtastic channel name across different LoRa regions worldwide.
+# BadPirate - meshtastic_frequency_slot_calculator
+
+Fork of [heypete](https://github.com/heypete/meshtastic_frequency_slot_calculator) repo of the same name.
+
+Has the same features +
+
+- [Region Support](https://github.com/heypete/meshtastic_frequency_slot_calculator/pull/2) - In python
 
 ## Motivation
 
