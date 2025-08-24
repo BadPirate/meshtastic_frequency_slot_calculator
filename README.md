@@ -20,7 +20,23 @@ Since the frequency slot value depends only on the channel name and the number o
 
 For example, it's possible to configure your Meshtastic node to use the `LONG_FAST` modem preset[^2] with slot `52` (which correponds to the `MediumSlow` channel name), but that won't allow one to communicate with people using the `MEDIUM_SLOW` modem preset even if they are also using the `MediumSlow` channel name. I can't think of any reason why someone would *want* to do that, but I wanted to mention that it's possible in case someone accidentally does it and wonders why they can't communicate with anyone.
 
-## Usage
+
+### Web Interface (Recommended)
+
+**🌐 [Try the live web calculator](https://badpirate.github.io/meshtastic_frequency_slot_calculator/)**
+
+The web interface provides:
+- Interactive form with live calculations
+- All 18 supported regions in a dropdown
+- Common preset buttons (LongFast, MediumSlow, etc.)
+- Real-time results as you type
+- Mobile-friendly responsive design
+- No installation required
+
+Simply open `index.html` in your browser or visit the GitHub Pages link above.
+
+### Python Command Line
+
 ```
 python3 frequency_slot.py
 
@@ -49,6 +65,48 @@ Selected Frequency: 910.875 MHz
 
 ## Limitations
 - Currently only produces output for the US region. I hope to add additional regions in the future.
+
+## JavaScript API
+
+The `frequency_calculator.js` file provides a JavaScript implementation that can be used in browsers or Node.js:
+
+```javascript
+// Include the script
+<script src="frequency_calculator.js"></script>
+
+// Calculate frequency slot
+const result = window.MeshtasticFrequencyCalculator.calculateFrequencySlot(
+    'US',        // region
+    'LongFast',  // channel name
+    null         // custom bandwidth (optional)
+);
+
+console.log(result);
+// {
+//   region: 'US',
+//   regionDescription: 'North America - 915 MHz ISM Band',
+//   frequencyRange: '902.0 - 928.0 MHz',
+//   channelName: 'LongFast',
+//   numFreqSlots: 104,
+//   frequencySlot: 20,
+//   selectedFrequency: 906.875,
+//   bandwidth: 250
+// }
+```
+
+### Available Functions
+
+- `calculateFrequencySlot(region, channelName, customBandwidth)` - Main calculation function
+- `getBandwidthKhz(channelName)` - Get bandwidth for channel name
+- `hashString(string)` - djb2 hash function implementation
+- `REGION_FREQUENCIES` - Object containing all region parameters
+
+## Files
+
+- `frequency_slot.py` - Original Python implementation with region support
+- `frequency_calculator.js` - JavaScript version for web/Node.js use
+- `index.html` - Interactive web interface with Bootstrap UI
+- `test.html` - Simple test page for JavaScript validation
 
 ### Footnotes
 [^1]: Although similarly named, the modem preset and channel name are different things entirely: the modem preset defines the bandwidth, spreading factor, and other parameters for the LoRa mdoem itself, while the channel name being essentially a chat room name.
