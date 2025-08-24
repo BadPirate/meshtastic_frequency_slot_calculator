@@ -5,6 +5,7 @@ Fork of [heypete](https://github.com/heypete/meshtastic_frequency_slot_calculato
 Has the same features +
 
 - [Region Support](https://github.com/heypete/meshtastic_frequency_slot_calculator/pull/2) - In python
+- [HTML / Web / JS Version](https://github.com/heypete/meshtastic_frequency_slot_calculator/pull/3) - Ability to see slot calc in realtime in a nice web-ui, just open index.html locally
 
 ## Motivation
 
@@ -20,14 +21,46 @@ I was interested in setting up a private primary channel and moving the defaults
 
 Fortunately, Meshtastic is open source and I was able to [read the source](https://github.com/meshtastic/firmware/blob/f6ed10f3298abf6896892ca7906d3231c8b3f567/src/mesh/RadioInterface.cpp) and implement the frequency slot calculation algorithm in python so I could calculate the slot for the `MediumSlow` channel. It turns out the slot for `MediumSlow` is `52`.
 
-### Traps for New Players
+## Traps for New Players
 Since the frequency slot value depends only on the channel name and the number of frequency slots in the region (104, in the US), it's possible calculate the frequency slot for any arbitrary channel name, even ones not associated with the built-in modem presets. However, ***the modem presets, channel names, and frequency slots all must exactly match those of other people one wishes to communicate with***.
 
 For example, it's possible to configure your Meshtastic node to use the `LONG_FAST` modem preset[^2] with slot `52` (which correponds to the `MediumSlow` channel name), but that won't allow one to communicate with people using the `MEDIUM_SLOW` modem preset even if they are also using the `MediumSlow` channel name. I can't think of any reason why someone would *want* to do that, but I wanted to mention that it's possible in case someone accidentally does it and wonders why they can't communicate with anyone.
 
-## Usage
 
-### Basic Usage (US Region - Default)
+## Web Interface (Recommended)
+
+**🌐 [Try the live web calculator](https://badpirate.github.io/meshtastic_frequency_slot_calculator/)**
+
+The web interface provides:
+- Interactive form with live calculations
+- All 18 supported regions in a dropdown
+- Common preset buttons (LongFast, MediumSlow, etc.)
+- Real-time results as you type
+- Mobile-friendly responsive design
+- No installation required
+
+Simply open `index.html` in your browser or visit the GitHub Pages link above.
+
+## Python Command Line
+
+### Command Line Options
+```
+usage: frequency_slot.py [-h] [--channel-name CHANNEL_NAME] [--bandwidth BANDWIDTH] [--region REGION]
+
+Calculate Meshtastic channel frequency based on region and channel name.
+
+options:
+-h, --help            show this help message and exit
+--channel-name, -n CHANNEL_NAME
+Specify the channel name (default: 'LongFast').
+--bandwidth, -bw BANDWIDTH
+Specify the bandwidth in kHz.
+--region, -r REGION   Specify the LoRa region (default: 'US'). Use --region help to see available
+regions.
+```
+
+### Basic Usage
+
 ```
 python3 frequency_slot.py
 
@@ -40,7 +73,7 @@ Selected Frequency: 906.875 MHz
 Bandwidth: 250 kHz
 ```
 
-### Custom Channel Name
+#### Custom Channel Name
 ```
 python3 frequency_slot.py -n MediumSlow
 
@@ -53,7 +86,7 @@ Selected Frequency: 914.875 MHz
 Bandwidth: 250 kHz
 ```
 
-### Different Regions
+#### Different Regions
 ```
 python3 frequency_slot.py --region EU_868 -n LongFast
 
@@ -66,7 +99,7 @@ Selected Frequency: 867.875 MHz
 Bandwidth: 250 kHz
 ```
 
-### View Available Regions
+#### View Available Regions
 ```
 python3 frequency_slot.py --region help
 
@@ -89,22 +122,6 @@ Available LoRa regions:
   SG_923: Singapore - 923 MHz Band
   UA_868: Ukraine - 868 MHz Band
   UA_433: Ukraine - 433 MHz Band
-```
-
-### Command Line Options
-```
-usage: frequency_slot.py [-h] [--channel-name CHANNEL_NAME] [--bandwidth BANDWIDTH] [--region REGION]
-
-Calculate Meshtastic channel frequency based on region and channel name.
-
-options:
-  -h, --help            show this help message and exit
-  --channel-name, -n CHANNEL_NAME
-                        Specify the channel name (default: 'LongFast').
-  --bandwidth, -bw BANDWIDTH
-                        Specify the bandwidth in kHz.
-  --region, -r REGION   Specify the LoRa region (default: 'US'). Use --region help to see available
-                        regions.
 ```
 
 ## Supported Regions
@@ -131,6 +148,48 @@ The calculator now supports 18 different LoRa regions based on the [Meshtastic r
 - **NZ_865**: New Zealand 865 MHz (864-868 MHz)
 
 Each region uses the appropriate frequency parameters as defined by local regulations and Meshtastic firmware.
+
+## JavaScript API
+
+The `frequency_calculator.js` file provides a JavaScript implementation that can be used in browsers or Node.js:
+
+```javascript
+// Include the script
+<script src="frequency_calculator.js"></script>
+
+// Calculate frequency slot
+const result = window.MeshtasticFrequencyCalculator.calculateFrequencySlot(
+    'US',        // region
+    'LongFast',  // channel name
+    null         // custom bandwidth (optional)
+);
+
+console.log(result);
+// {
+//   region: 'US',
+//   regionDescription: 'North America - 915 MHz ISM Band',
+//   frequencyRange: '902.0 - 928.0 MHz',
+//   channelName: 'LongFast',
+//   numFreqSlots: 104,
+//   frequencySlot: 20,
+//   selectedFrequency: 906.875,
+//   bandwidth: 250
+// }
+```
+
+### Available Functions
+
+- `calculateFrequencySlot(region, channelName, customBandwidth)` - Main calculation function
+- `getBandwidthKhz(channelName)` - Get bandwidth for channel name
+- `hashString(string)` - djb2 hash function implementation
+- `REGION_FREQUENCIES` - Object containing all region parameters
+
+## Files
+
+- `frequency_slot.py` - Original Python implementation with region support
+- `frequency_calculator.js` - JavaScript version for web/Node.js use
+- `index.html` - Interactive web interface with Bootstrap UI
+- `test.html` - Simple test page for JavaScript validation
 
 ### Footnotes
 [^1]: Although similarly named, the modem preset and channel name are different things entirely: the modem preset defines the bandwidth, spreading factor, and other parameters for the LoRa mdoem itself, while the channel name being essentially a chat room name.
